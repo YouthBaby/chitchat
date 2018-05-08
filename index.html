@@ -17,6 +17,8 @@
         <hr> 私聊
         <input type="text" id="msginput">
         <button id="sendmsg">发送</button>
+        <input type="file" id="picture">
+        <button id="sendImg">发送图片</button>
     </div>
     <div style="float: left; width: 65%" id="chatbox">
 
@@ -27,9 +29,9 @@
 <script>  
     let socket = io.connect('http://localhost:3000')
 
-    let msgInput = $('#msginput')
-    let nameInput = $('#nameinput')
-    let username = $('#username')
+    let msgInput = $('#msginput'),
+        nameInput = $('#nameinput'),
+        username = $('#username')
 
     $('#adduser').click(() => {
         let name = username.val()
@@ -47,27 +49,29 @@
         $('#chatbox').append($(`<div>${data.from}: ${data.msg}</div>`))
     })
 
-    // sendImg.addEventListener('click', () => {
-    //     let Imginput = document.getElementById('tupian')
-    //     let file = Imginput.files[0]       //得到该图片  
-    //     let formData = new FormData()
-    //     formData.append(file.name, file)
-    //     let xhr = new XMLHttpRequest()
-    //     xhr.open('POST', '/sendimg', true)
-    //     xhr.send(formData)
-    //     xhr.onreadystatechange = () => {
-    //         if (xhr.readyState === 4 && xhr.status === 200) {
-    //             console.log('success');
-    //             let data = { img: xhr.responseText }
-    //             socket.emit('sendImg', data)
-    //         }
-    //     }
-    // })
-    // socket.on('receiveImg', (data) => {
-    //     let ImgDIV = document.createElement('div')
-    //     ImgDIV.innerHTML = `<div>${data.id}: <img src=/images/${data.img}></div>`
-    //     showbox.appendChild(ImgDIV)
-    // })  
+    $('#sendImg').click(() => {
+        let Imginput = document.getElementById('picture')
+        let file = Imginput.files[0]       //得到该图片 
+        let formData = new FormData()
+        formData.append(file.name, file)
+        $.ajax({
+            type: "POST",
+            url: '/sendimg',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: (res) => {
+                let from = username.val()
+                let to = nameInput.val()
+                let data = { from, to, img: res }
+                socket.emit('sendImg', data)
+            }
+        })
+    })
+
+    socket.on('receiveImg', (data) => {
+        $('#chatbox').append($(`<div>${data.from}: <img src=/images/${data.img}></div>`))
+    })  
 </script>
 </body>
 

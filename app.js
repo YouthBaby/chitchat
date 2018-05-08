@@ -1,3 +1,4 @@
+const path = require('path')
 const express = require('express')
 const app = express()
 const server = require('http').Server(app)
@@ -39,5 +40,10 @@ io.on('connection', (socket) => {
         let id = userList.get(data.to)
         let tosocket = io.sockets.sockets[id]
         tosocket.emit('receiveMsg', data)
+    })
+    socket.on('sendImg', (data) => {
+        let id = userList.get(data.to)
+        let tosocket = io.sockets.sockets[id]
+        tosocket.emit('receiveImg', data)
     })
 })
