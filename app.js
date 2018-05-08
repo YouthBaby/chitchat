@@ -27,23 +27,6 @@ app.post('/sendimg', (req, res, next) => {
     })
 })
 
-// let group1 = io.of('/group1')
-// let group2 = io.of('/group2')
-
-// group1.on('connection', (socket) => {
-//     socket.on('sendMsg', (data) => {
-//         data.id = socket.id
-//         group1.emit('receiveMsg', data)
-//     })
-// })
-
-// group2.on('connection', (socket) => {
-//     socket.on('sendMsg', (data) => {
-//         data.id = socket.id
-//         group2.emit('receiveMsg', data)
-//     })
-// })  
-
 io.on('connection', (socket) => {
     socket.on('adduser', (data) => {
         userList.set(data.name, socket.id)
