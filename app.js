@@ -18,13 +18,14 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html')
 })
 app.post('/sendimg', (req, res, next) => {
-    let imgname = null
     form.parse(req, (err, fields, files) => {
-        res.send(imgname)
+        res.json({
+            "errno": err === null ? 0 : 1,
+            "data": Object.keys(files).map(name => `/images/${name}`)
+        })
     })
     form.on('fileBegin', (name, file) => {
         file.path = path.join(__dirname, `./static/images/${file.name}`)
-        imgname = file.name
     })
 })
 

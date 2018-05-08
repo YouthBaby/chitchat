@@ -9,35 +9,57 @@
           content="ie=edge">
     <title>群聊</title>
     <link rel="stylesheet"
-          href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css"
-          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
           crossorigin="anonymous">
+    <link href="https://cdn.bootcss.com/wangEditor/3.1.1/wangEditor.min.css"
+          rel="stylesheet">
     <style>
-        
+        .border {
+            border: 1px solid #ccc;
+        }
+
+        .border-fix {
+            border-top: none;
+            border-bottom: none;
+        }
+
+        .padding-fix {
+            padding: 0px;
+        }
+
+        .content {
+            height: 400px;
+        }
     </style>
 </head>
 
 <body>
-    <div class="container-fluid">
-        <div id="chatbox"
-             class=".col-xs-12 .col-md-12 .col-lg-12">
-            <button type="button"
-                    class="btn btn-primary btn-sm">发  送</button>
+    <div class="container">
+        <div class="page-header">
+            <h1>聊天室</h1>
         </div>
-        <div>
-            发给
-            <input type="text"
-                   id="nameinput">
-            <button id="adduser">添加用户</button>
-            <input type="text"
-                   id="username">
-            <hr> 私聊
-            <input type="text"
-                   id="msginput">
-            <button id="sendmsg">发送</button>
-            <input type="file"
-                   id="picture">
-            <button id="sendImg">发送图片</button>
+        <div class="row">
+            <div id="content"
+                 class="content border col-md-6 col-md-offset-3 padding-fix"></div>
+        </div>
+        <div class="row">
+            <div id="chatbox"
+                 class="col-md-6 col-md-offset-3 padding-fix">
+                <div id="menu"
+                     style="background-color:#f1f1f1; border:1px solid #ccc;"></div>
+                <div id="editor"
+                     style="border:1px solid #ccc; border-top: none; border-bottom: none; height:100px; z-index:10000;"></div>
+            </div>
+            <div class="col-md-6 col-md-offset-3 padding-fix border"
+                 style="text-align: right;border-top: none">
+                <button type="button"
+                        class="btn btn-primary btn-sm">
+                    <span>发送</span>
+                    <span class="glyphicon glyphicon-send"
+                          aria-hidden="true"></span>
+                </button>
+            </div>
         </div>
     </div>
 </body>
@@ -47,56 +69,43 @@
 <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js"
         integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
         crossorigin="anonymous"></script>
-<script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"
-        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
         crossorigin="anonymous"></script>
+<script src="https://cdn.bootcss.com/wangEditor/3.1.1/wangEditor.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
-<script>  
+<script> 
+
+    (function initEditor() {
+        const E = window.wangEditor
+        const editor = new E('#menu', '#editor')
+        editor.customConfig.menus = [
+            'bold',  // 粗体
+            'foreColor',  // 文字颜色
+            'emoticon',  // 表情
+            'image',  // 插入图片
+        ]
+        editor.customConfig.uploadImgHooks = {
+            fail: function (xhr, editor, result) {
+                console.log(xhr)
+                console.log(result)
+            },
+            error: function (xhr, editor) {
+                console.log(xhr)
+            },
+        }
+        editor.customConfig.debug = true
+        editor.customConfig.uploadImgServer = '/sendimg'  // 上传图片到服务器
+        editor.customConfig.showLinkImg = false
+        editor.create()
+    }())
+
     let socket = io.connect('http://localhost:3000')
 
-    let msgInput = $('#msginput'),
-        nameInput = $('#nameinput'),
-        username = $('#username')
-
-    $('#adduser').click(() => {
-        let name = username.val()
-        socket.emit('adduser', { name })
-    })
-
-    $('#sendmsg').click(() => {
-        let from = username.val()
-        let to = nameInput.val()
-        let msg = msgInput.val()
-        socket.emit('compose', { from, to, msg })
-    })
-
     socket.on('receiveMsg', (data) => {
-        $('#chatbox').append($(`<div>${data.from}: ${data.msg}</div>`))
+        $('#content').append($(`<div>${data.from}: ${data.msg}</div>`))
     })
 
-    $('#sendImg').click(() => {
-        let Imginput = document.getElementById('picture')
-        let file = Imginput.files[0]       //得到该图片 
-        let formData = new FormData()
-        formData.append(file.name, file)
-        $.ajax({
-            type: "POST",
-            url: '/sendimg',
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: (res) => {
-                let from = username.val()
-                let to = nameInput.val()
-                let data = { from, to, img: res }
-                socket.emit('sendImg', data)
-            }
-        })
-    })
-
-    socket.on('receiveImg', (data) => {
-        $('#chatbox').append($(`<div>${data.from}: <img src=/images/${data.img}></div>`))
-    })  
 </script>
 </body>
 
