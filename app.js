@@ -1,17 +1,16 @@
-const path = require('path')
 const express = require('express')
 const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
 const bodyParser = require('body-parser')
-const form = require('formidable').IncomingForm()
+const route = require('./router')
+
 const userList = new Map()
 
-form.uploadDir = './static/images'
-
-app.use(express.static('./static'))
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser())
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(express.static('./static'))
 
 server.listen(3000, () => {
     console.log('server running at 127.0.0.1:3000');
@@ -22,30 +21,10 @@ const register = (name) => (socketId) => {
 }
 
 let username = ''
-
+app.use('/', route)
 app.post('/chat', (req, res) => {
     username = req.body.name
-    res.json('success')
-})
-
-app.get('/chat', (req, res) => {
-    res.sendFile(__dirname + '/index.html')
-})
-
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/login.html')
-})
-
-app.post('/sendimg', (req, res, next) => {
-    form.parse(req, (err, fields, files) => {
-        res.json({
-            "errno": err === null ? 0 : 1,
-            "data": Object.keys(files).map(name => `/images/${name}`)
-        })
-    })
-    form.on('fileBegin', (name, file) => {
-        file.path = path.join(__dirname, `./static/images/${file.name}`)
-    })
+    return res.end('success')
 })
 
 io.on('connection', (socket) => {
