@@ -3,20 +3,39 @@ const express = require('express')
 const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
+const bodyParser = require('body-parser')
 const form = require('formidable').IncomingForm()
 const userList = new Map()
 
 form.uploadDir = './static/images'
 
 app.use(express.static('./static'))
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 
 server.listen(3000, () => {
     console.log('server running at 127.0.0.1:3000');
 })
 
-app.get('/', (req, res) => {
+const register = (name) => (socketId) => {
+    userList.set(socketId, name)
+}
+
+let username = ''
+
+app.post('/chat', (req, res) => {
+    username = req.body.name
+    res.json('success')
+})
+
+app.get('/chat', (req, res) => {
     res.sendFile(__dirname + '/index.html')
 })
+
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/login.html')
+})
+
 app.post('/sendimg', (req, res, next) => {
     form.parse(req, (err, fields, files) => {
         res.json({
@@ -31,20 +50,14 @@ app.post('/sendimg', (req, res, next) => {
 
 io.on('connection', (socket) => {
     socket.on('adduser', (data) => {
-        userList.set(data.name, socket.id)
+        register(username)(socket.id)
         socket.emit('receiveMsg', {
-            from: '系统',
-            msg: `添加${data.name}成功`
+            name: '系统',
+            msg: `添加用户: ${username} 成功`
         })
     })
-    socket.on('compose', (data) => {
-        let id = userList.get(data.to)
-        let tosocket = io.sockets.sockets[id]
-        tosocket.emit('receiveMsg', data)
-    })
-    socket.on('sendImg', (data) => {
-        let id = userList.get(data.to)
-        let tosocket = io.sockets.sockets[id]
-        tosocket.emit('receiveImg', data)
+    socket.on('sendMsg', (data) => {
+        data.name = userList.get(data.id)
+        io.emit('receiveMsg', data)
     })
 })

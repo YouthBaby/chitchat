@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible"
+          content="ie=edge">
+    <title>登录</title>
+    <link rel="stylesheet"
+          href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+          crossorigin="anonymous">
+    <style>
+        .container {
+            margin-top: 100px;
+        }
+
+        form {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <form>
+                    <div class="form-group">
+                        <label class="sr-only"
+                               for="username"></label>
+                        <div class="input-group">
+                            <div class="input-group-addon">昵称</div>
+                            <input type="text"
+                                   class="form-control"
+                                   id="username"
+                                   placeholder="please enter your nickName">
+                        </div>
+                    </div>
+                    <button type="button"
+                            id="login"
+                            class="btn btn-primary">登录</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+    <script>
+        $('#login').click(() => {
+            $.ajax({
+                url: '/chat',
+                type: 'POST',
+                data: {
+                    name: $('#username').val()
+                },
+                success: (res) => {
+                    if (res === 'success') {
+                        window.location.href = 'http://127.0.0.1:3000/chat'
+                    }
+                }
+            })
+        })
+    </script>
+</body>
+
+</html>

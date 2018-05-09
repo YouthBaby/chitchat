@@ -54,6 +54,7 @@
             <div class="col-md-6 col-md-offset-3 padding-fix border"
                  style="text-align: right;border-top: none">
                 <button type="button"
+                        id="send"
                         class="btn btn-primary btn-sm">
                     <span>发送</span>
                     <span class="glyphicon glyphicon-send"
@@ -63,8 +64,8 @@
         </div>
     </div>
 </body>
-<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
 <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js"
         integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
@@ -76,7 +77,7 @@
 <script src="/socket.io/socket.io.js"></script>
 <script> 
 
-    (function initEditor() {
+    const editor = (function initEditor() {
         const E = window.wangEditor
         const editor = new E('#menu', '#editor')
         editor.customConfig.menus = [
@@ -85,25 +86,27 @@
             'emoticon',  // 表情
             'image',  // 插入图片
         ]
-        editor.customConfig.uploadImgHooks = {
-            fail: function (xhr, editor, result) {
-                console.log(xhr)
-                console.log(result)
-            },
-            error: function (xhr, editor) {
-                console.log(xhr)
-            },
-        }
         editor.customConfig.debug = true
         editor.customConfig.uploadImgServer = '/sendimg'  // 上传图片到服务器
         editor.customConfig.showLinkImg = false
         editor.create()
+        return editor
     }())
 
     let socket = io.connect('http://localhost:3000')
 
+    socket.emit('adduser')
+
+    $('#send').click(() => {
+        socket.emit('sendMsg', {
+            id: socket.id,
+            msg: editor.txt.html()
+        })
+        editor.txt.clear()
+    })
     socket.on('receiveMsg', (data) => {
-        $('#content').append($(`<div>${data.from}: ${data.msg}</div>`))
+        let content = $(`<div>${data.name}: ${data.msg}</div>`)
+        $('#content').append(content)
     })
 
 </script>
