@@ -30,6 +30,7 @@
 
         .content {
             height: 400px;
+            overflow: auto;
         }
     </style>
 </head>
@@ -93,9 +94,11 @@
         return editor
     }())
 
-    let socket = io.connect('http://localhost:3000')
+    let socket = io.connect('http://192.168.31.30:3000')
 
-    socket.emit('adduser')
+    socket.emit('adduser', {
+        name: localStorage.getItem('name')
+    })
 
     $('#send').click(() => {
         socket.emit('sendMsg', {

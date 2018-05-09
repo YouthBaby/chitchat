@@ -1,3 +1,4 @@
+const path = require('path')
 const express = require('express')
 const app = express()
 const server = require('http').Server(app)
@@ -7,8 +8,6 @@ const route = require('./router')
 
 const userList = new Map()
 
-app.use(bodyParser())
-app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static('./static'))
 
@@ -20,19 +19,14 @@ const register = (name) => (socketId) => {
     userList.set(socketId, name)
 }
 
-let username = ''
 app.use('/', route)
-app.post('/chat', (req, res) => {
-    username = req.body.name
-    return res.end('success')
-})
-
+app.set('view engine', 'html')
 io.on('connection', (socket) => {
     socket.on('adduser', (data) => {
-        register(username)(socket.id)
+        register(data.name)(socket.id)
         socket.emit('receiveMsg', {
             name: '系统',
-            msg: `添加用户: ${username} 成功`
+            msg: `添加用户: ${data.name} 成功`
         })
     })
     socket.on('sendMsg', (data) => {

@@ -1,22 +1,22 @@
 {
-  "name": "chitchat",
-  "version": "1.0.0",
-  "description": "websocket chitchat socket.io",
-  "main": "app.js",
-  "scripts": {
-    "test": "node app.js"
-  },
-  "keywords": [
-    "chitchat",
-    "socket.io",
-    "websocket"
-  ],
-  "author": "YouthBaby",
-  "license": "MIT",
-  "dependencies": {
-    "body-parser": "^1.18.2",
-    "express": "^4.16.3",
-    "formidable": "^1.2.1",
-    "socket.io": "^2.1.0"
-  }
+    "name": "chitchat",
+    "version": "1.0.0",
+    "description": "websocket chitchat socket.io",
+    "main": "app.js",
+    "scripts": {
+        "test": "node app.js"
+    },
+    "keywords": [
+        "chitchat",
+        "socket.io",
+        "websocket"
+    ],
+    "author": "YouthBaby",
+    "license": "MIT",
+    "dependencies": {
+        "body-parser": "^1.18.2",
+        "express": "^4.16.3",
+        "formidable": "^1.2.1",
+        "socket.io": "^2.1.0"
+    }
 }
