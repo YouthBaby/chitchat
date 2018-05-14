@@ -1,10 +1,11 @@
+const path = require('path')
 const router = require('express').Router()
 
 router.get('/', (req, res) => {
-    res.sendFile(__dirname + '/login.html')
+    res.sendFile(path.join(__dirname, '..', 'login.html'))
 })
 router.get('/login', (req, res) => {
-    res.sendFile(__dirname + '/index.html')
+    res.sendFile(path.join(__dirname, '..', 'index.html'))
 })
 router.post('/login', (req, res) => {
     return res.json({
@@ -14,6 +15,6 @@ router.post('/login', (req, res) => {
     })
 })
 
-router.post('/sendimg', require('./routes/sendimg.js'))
+router.post('/sendimg', require('./sendimg'))
 
 module.exports = router

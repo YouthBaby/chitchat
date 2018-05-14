@@ -94,7 +94,7 @@
         return editor
     }())
 
-    let socket = io.connect('http://192.168.31.30:3000')
+    let socket = io.connect('http://127.0.0.1:3000')
 
     socket.emit('adduser', {
         name: localStorage.getItem('name')

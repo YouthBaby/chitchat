@@ -6,7 +6,7 @@ form.encoding = 'utf-8'
 
 module.exports = async (req, res) => {
     form.on('fileBegin', (name, file) => {
-        file.path = path.join(__dirname, `../static/images/${file.name}`)
+        file.path = path.join(__dirname, '..', `static/images/${file.name}`)
     })
     res.json(await new Promise((resolve) => {
         form.parse(req, (err, fields, files) => {
